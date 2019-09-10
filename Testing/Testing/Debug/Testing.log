@@ -1,0 +1,11 @@
+﻿  Testing.cpp
+c:\users\raffi\source\repos\testing\testing\testing.cpp(510): warning C4018: '<': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(670): warning C4018: '<': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(703): warning C4018: '<=': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(727): warning C4018: '<': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(759): warning C4018: '<': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(770): warning C4018: '<': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(784): warning C4018: '<': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(802): warning C4018: '<': signed/unsigned mismatch
+c:\users\raffi\source\repos\testing\testing\testing.cpp(822): warning C4018: '<': signed/unsigned mismatch
+  Testing.vcxproj -> C:\Users\raffi\source\repos\Testing\Debug\Testing.exe
