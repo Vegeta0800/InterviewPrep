@@ -3,6 +3,8 @@
 #include <iostream>
 #include <unordered_set>
 #include <vector>
+#include <functional>
+#include <string>
 
 template <typename T>
 struct Node
@@ -213,7 +215,6 @@ public:
 		delete[] elements;
 	}
 
-
 	void PushBack(T element)
 	{
 		m++;
@@ -344,7 +345,6 @@ struct Queue
 		}
 	}
 
-
 	int GetSize()
 	{
 		return this->size;
@@ -428,6 +428,38 @@ struct CircleQueue
 	int front;
 	int back;
 };
+
+template<typename T>
+struct Leaf	
+{
+	T value;
+	Leaf* left;
+	Leaf* right;
+
+	Leaf(T val)
+	{
+		value = val;
+		left = nullptr;
+		right = nullptr;
+	}
+
+};
+
+int height(Leaf<int>* node)
+{
+	if (node == nullptr)
+		return 0;
+	else
+	{
+		int lheight = height(node->left);
+		int rheight = height(node->right);
+
+		if (lheight > rheight)
+			return(lheight + 1);
+		else
+			return(rheight + 1);
+	}
+}
 
 class Graph
 {
@@ -857,14 +889,618 @@ private:
 	bool running;
 };
 
+bool CheckIfPalindrome(const char* input, int start, int end)
+{
+	for (int i = ((end - start) - 1); i >= 0; i--)
+	{
+		size_t hashOne = std::hash<char>() (input[i]);
+		size_t hashTwo = std::hash<char>() (input[((end - start) - (i +  1))]);
+
+		if (hashOne != hashTwo)
+			return false;
+	}
+
+	return true;
+}
+
+template<typename T>
+class Tree
+{
+public:
+	void PreorderTraversalRecursion(Leaf<T>* root)
+	{
+		if (root == nullptr)
+			return;
+
+		std::cout << root->value << " ";
+
+		PreorderTraversalRecursion(root->left);
+		PreorderTraversalRecursion(root->right);
+	}
+	void InorderTraversalRecursion(Leaf<T>* root)
+	{
+		if (root == nullptr)
+			return;
+
+		InorderTraversalRecursion(root->left);
+
+		std::cout << root->value << " ";
+
+		InorderTraversalRecursion(root->right);
+	}
+	void PostorderTraversalRecursion(Leaf<T>* root)
+	{
+		if (root == nullptr)
+			return;
+
+		PostorderTraversalRecursion(root->left);
+		PostorderTraversalRecursion(root->right);
+
+		std::cout << root->value << " ";
+
+	}
+	void LevelOrderRoutine(Leaf<T>* node, int i)
+	{
+		if (node == nullptr)
+			return;
+		if (i == 1)
+			std::cout << node->value << " ";
+		else if (i > 1)
+		{
+			LevelOrderRoutine(node->left, i - 1);
+			LevelOrderRoutine(node->right, i - 1);
+		}
+	}
+	void LevelOrderTraversalRecursion(Leaf<T>* root)
+	{
+		int h = height(root);
+
+		for (int i = 1; i <= h; i++)
+			LevelOrderRoutine(root, i);
+	}
+
+	void PreorderTraversalIterative(Leaf<T>* root)
+	{
+		Stack<Leaf<T>*> stack;
+
+		Leaf<T>* current = root;
+
+		while (true)
+		{
+			while (current != nullptr)
+			{
+				std::cout << current->value << " ";
+				stack.PushBack(current);
+				current = current->left;
+			}
+
+			if (stack.Empty())
+				return;
+
+			current = stack.Top();
+			stack.Pop();
+			current = current->right;
+		}
+	}
+	void InorderTraversalIterative(Leaf<T>* root)
+	{
+		Stack<Leaf<T>*> stack;
+
+		Leaf<T>* current = root;
+
+		while (true)
+		{
+			while (current != nullptr)
+			{
+				stack.PushBack(current);
+				current = current->left;
+			}
+
+			if (stack.Empty())
+				return;
+
+			current = stack.Top();
+			std::cout << current->value << " ";
+			stack.Pop();
+			current = current->right;
+		}
+	}
+	void PostorderTraversalIterative(Leaf<T>* root)
+	{
+		Stack<Leaf<T>*> stack;
+
+		Leaf<T>* current = root;
+
+		do
+		{
+			while (current != nullptr)
+			{
+
+				if (current->right != nullptr)
+					stack.PushBack(current->right);
+
+				stack.PushBack(current);
+
+				current = current->left;
+			}
+
+			current = stack.Top();
+			stack.Pop();
+
+			if (current->right != nullptr && stack.Top() == current->right)
+			{
+				stack.Pop();
+				stack.PushBack(current);
+				current = current->right;
+			}
+			else
+			{
+				std::cout << current->value << " ";
+				current = nullptr;
+			}
+		} while (!stack.Empty());
+	}
+	void LevelOrderTraversalIterative(Leaf<T>* root)
+	{
+		if (root == nullptr) return;
+
+		Queue<Leaf<T>*> q;
+
+		q.Push(root);
+
+		while (q.isEmpty() == false)
+		{
+			int nodeCount = q.GetSize();
+
+			while (nodeCount > 0)
+			{
+				Leaf<T>*  node = q.GetFront();
+				std::cout << node->value << " ";
+				q.Pop();
+				if (node->left != nullptr)
+					q.Push(node->left);
+				if (node->right != nullptr)
+					q.Push(node->right);
+				nodeCount--;
+			}
+
+			std::cout << std::endl;
+		}
+	}
+
+	int FindMaximum(Leaf<T>* root)
+	{
+		if (root == nullptr) return 0;
+
+		int val = root->value;
+		int lval = FindMaximum(root->left);
+		int rval = FindMaximum(root->right);
+
+		if (lval > val)
+			val = lval;
+		if (rval > val)
+			val = rval;
+
+		return val;
+	}
+	int CountNodes(Leaf<T>* root)
+	{
+		if (root == nullptr) return 0;
+
+		return (1 + CountNodes(root->left) + CountNodes(root->right));
+	}
+	bool isComplete(Leaf<T>* root, int index, int nodeAmount)
+	{
+		if (root == nullptr) return true;
+
+		if (index >= nodeAmount)
+			return (false);
+
+		return (isComplete(root->left, 2 * index + 1, nodeAmount) &&
+			isComplete(root->right, 2 * index + 2, nodeAmount));
+	}
+	T PrintSumOfLevels(Leaf<T>* root)
+	{
+		if (root == nullptr) return NULL;
+
+		Queue<Leaf<T>*> q;
+
+		T totalSum = NULL;
+
+		q.Push(root);
+
+		while (q.isEmpty() == false)
+		{
+			int nodeCount = q.GetSize();
+
+			T sumOfLevel = NULL;
+
+			while (nodeCount > 0)
+			{
+				Leaf<T>*  node = q.GetFront();
+				sumOfLevel += node->value;
+				totalSum += node->value;
+				q.Pop();
+				if (node->left != nullptr)
+					q.Push(node->left);
+				if (node->right != nullptr)
+					q.Push(node->right);
+				nodeCount--;
+			}
+
+			std::cout << sumOfLevel << std::endl;
+		}
+
+		return totalSum;
+	}
+	bool FindValue(Leaf<T>* root, T value)
+	{
+		if (root == nullptr) return false;
+
+		bool l = FindValue(root->left, value);
+		bool r = FindValue(root->right, value);
+
+		if (root->value == value) return true;
+
+		return l | r;
+	}
+	bool FindSubtree(Leaf<T>* root, T value)
+	{
+		if (root == nullptr) return false;
+
+		T lV = PrintSumOfLevels(root->left);
+		T rV = PrintSumOfLevels(root->right);
+
+		T sum = root->value + lV + rV;
+
+		if (sum == value) return true;
+
+		bool lB = FindSubtree(root->left, value);
+		bool rB = FindSubtree(root->right, value);
+
+		return lB | rB;
+	}
+};
+
+bool isPowerOfTwo(int number)
+{
+	return (number & (number - 1)) == 0;
+}
+
+int FindNonDuplicate(int arr[], int size)
+{
+	int result = arr[0];
+
+	for (int i = 1; i < size; i++)
+	{
+		result = result ^ arr[i];
+	}
+
+	return result;
+}
+
+void possibleSubsets(int A[], int N)
+{
+	for (int i = 0; i < (1 << N); ++i)
+	{
+		for (int j = 0; j < N; ++j)
+			if (i & (1 << j))
+				std::cout << A[j] << ' ';
+		std::cout << std::endl;
+	}
+}
+
+std::vector<int> GetSetBits(int number)
+{
+	std::vector<int> arr;
+
+	int count = 0;
+	int n = 0;
+
+	for (int i = 1; i <= number; i++)
+	{
+		count = 0;
+		n = i;
+
+		while (n)
+		{
+			n &= (n - 1);
+			count++;
+		}
+		arr.push_back(count);
+	}
+
+	return arr;
+}
+
+void Reverse(std::string& input)
+{
+	for (int i = 0; i < input.size() / 2; i++)
+	{
+		char temp = input[i];
+		input[i] = input[(input.size() - 1) - i];
+		input[(input.size() - 1) - i] = temp;
+	}
+}
+
+int ReversDigits(int num)
+{
+	static int rev_num = 0;
+	static int base_pos = 1;
+	if (num > 0)
+	{
+		ReversDigits(num / 10);
+		rev_num += (num % 10) * base_pos;
+		base_pos *= 10;
+	}
+	return rev_num;
+}
+
+char FirstUnique(std::string input)
+{
+	bool unique = true;
+
+	for (int i = 0; i < input.size(); i++)
+	{
+		unique = true;
+
+		for (int j = 0; j < input.size(); j++)
+		{
+			if(j == i) continue;
+			if (input[i] == input[j])
+			{
+				unique = false;
+				break;
+			}
+		}
+
+		if (unique)
+			return input[i];
+	}
+
+	return 0;
+}
+
+bool ValidAnagram(std::string string, std::string check)
+{
+	int valOfString = 0;
+	int valOfCheck = 0;
+
+	for (char c : string)
+	{
+		valOfString += c;
+	}
+
+	for (char c : check)
+	{
+		valOfCheck += c;
+	}
+
+	return (valOfCheck == valOfString);
+}
+
+std::string CountAndSay(int number)
+{
+	if (number == 1) return "1";
+	if (number == 2) return "11";
+
+	std::string str = "11";
+	for (int i = 3; i <= number; i++)
+	{
+		// In below for loop, previous character 
+		// is processed in current iteration. That 
+		// is why a dummy character is added to make 
+		// sure that loop runs one extra iteration. 
+		str += '$';
+		int len = str.length();
+
+		int cnt = 1; // Initialize count of matching chars 
+		std::string  tmp = ""; // Initialize i'th term in series 
+
+		// Process previous term to find the next term 
+		for (int j = 1; j < len; j++)
+		{
+			// If current character does't match 
+			if (str[j] != str[j - 1])
+			{
+				// Append count of str[j-1] to temp 
+				tmp += cnt + '0';
+
+				// Append str[j-1] 
+				tmp += str[j - 1];
+
+				// Reset count 
+				cnt = 1;
+			}
+
+			//  If matches, then increment count of matching 
+			// characters 
+			else cnt++;
+		}
+
+		// Update str 
+		str = tmp;
+	}
+
+	return str;
+}
+
+void DeleteElem(int* arr, int size, int index)
+{
+	for (int i = index; i > (size - 1); i++)
+	{
+		int temp = arr[i];
+		arr[i] = arr[i + 1];
+		arr[i + 1] = temp;
+	}
+}
+
+int FilterIterator(int* arr, int size, bool predicate(int))
+{
+	int newSize = size;
+
+	for (int i = 0; i < newSize;)
+	{
+		if (!predicate(arr[i]))
+		{
+			for (int j = i; j < (newSize - 1); j++)
+			{
+				int temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+
+			newSize--;
+		}
+		else
+			i++;
+	}
+
+	int* output = new int[newSize];
+	memcpy(output, arr, newSize * sizeof(int));
+	arr = output;
+	delete[] output;
+
+	return newSize;
+}
+
+bool Filter(int value)
+{
+	return (value % 2 == 0);
+}
+
+int convert(char c)
+{
+	if (c == 'I')
+		return 1;
+	if (c == 'V')
+		return 5;
+	if (c == 'X')
+		return 10;
+	if (c == 'L')
+		return 50;
+	if (c == 'C')
+		return 100;
+	if (c == 'D')
+		return 500;
+	if (c == 'M')
+		return 1000;
+}
+
+int ConvertRoman(std::string input)
+{
+	int number = 0;
+
+	for (int i = 0; i < input.size(); i++)
+	{
+		int first = convert(input[i]);
+
+		if (i != input.size() - 1)
+		{
+			int second = convert(input[i + 1]);
+
+			if (second > first)
+			{
+				number += (second - first);
+				i++;
+			}
+			else
+				number += first;
+		}
+		else
+			number += first;
+	}
+
+	return number;
+}
+
+bool ValidateSquare(int arr[][3])
+{
+	int magic = 0;
+	int value = 0;
+
+	for (int i = 0; i < 3; i++)
+		magic += arr[i][i];
+
+	for (int i = 0; i < 3; i++)
+		value += arr[i][3 - 1 - i];
+
+	if (magic != value) return false;
+
+	for (int i = 0; i < 3; i++)
+	{
+		value = 0;
+		for (int j = 0; j < 3; j++)
+		{
+			value += arr[j][i];
+		}
+
+		if (value != magic) return false;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		value = 0;
+		for (int j = 0; j < 3; j++)
+		{
+			value += arr[i][j];
+		}
+
+		if (value != magic) return false;
+	}
+
+	return true;
+}
+
+struct Conversion
+{
+	Conversion(std::string n1, std::string n2, float r)
+	{
+		name1 = n1;
+		name2 = n2;
+		ratio = r;
+	}
+
+	std::string name1;
+	std::string name2;
+	float ratio;
+};
+
+void ConvertUnits(float input)
+{
+	std::vector<Conversion> conversions;
+	conversions.push_back(Conversion("kg", "lbs", 2.2f));
+	conversions.push_back(Conversion("miles", "km", 1.6f));
+
+	for (int i = 0; i < conversions.size(); i++)
+	{
+		std::cout << input << " " << conversions[i].name1 << " == ";
+		std::cout << input * conversions[i].ratio << " " << conversions[i].name2 << std::endl;
+	}
+}
+
+int FindMaxFont(std::string input)
+{
+	int max = 100;
+	int min = 1;
+
+	int rh = 50;
+	int rw = 70;
+
+	int h = 30;
+	int w = input.size() * 3 * min;
+
+	int font = min;
+
+	for (int i = min; i <= max; i++)
+	{
+		w = input.size() * 3 * i;
+
+		if (w > rw) return w;
+	}
+}
+
 int main()
 {
-	Nimm nimm(4);
-
-	nimm.GetRows()[0] = 4;
-	nimm.GetRows()[1] = 5;
-	nimm.GetRows()[2] = 2;
-	nimm.GetRows()[3] = 3;
-
-	nimm.Game();
+	ConvertUnits(5);
 }
